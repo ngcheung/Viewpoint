@@ -1,3 +1,57 @@
+### Create
+```
+options = {
+  :subject=>"repeat for 3 months", 
+  :body=>"please", 
+  :start=>Time.now + 1.hour, 
+  :end=>Time.now + 2.hours, :location=>"playground", 
+  :recurrence=>{
+    :daily_recurrence=>{
+      :interval=>1
+    }, 
+    :end_date_recurrence=>{
+      :start_date=>{
+        :text=>(Time.now + 1.hour).strftime("%Y-%m-%d")
+      },
+      :end_date=>{
+        :text=>(Time.now + 1.hour + 3.months).strftime("%Y-%m-%d")
+      }
+    }
+  }
+}
+
+options = {
+  :subject => "repeat seven times",
+  :start => Time.now,
+  :end => Time.now + 1.hour,
+  :recurrence => {
+    :daily_recurrence => {
+      :interval => 1
+    },
+    :numbered_recurrence => { 
+      :start_date => {
+        :text => Time.now.strftime("%Y-%m-%d")
+      },
+      :number_of_occurrences => 7
+    }
+  }
+}
+
+calendar.create_item options
+```
+### Update
+```
+rec = {:sub_elements=>[{:daily_recurrence=>{:sub_elements=>{:interval=>{:text=>1}}}}, {:end_date_recurrence=>{:sub_elements=>[{:start_date=>{:text=>(Time.now + 1.hour).strftime("%Y-%m-%d")}},{:end_date=>{:text=>(Time.now + 1.hour + 5.days).strftime("%Y-%m-%d")}}]}}]}
+
+calendar.items.first.update_item!(recurrence: rec)
+```
+
+### Delete
+```
+.delete!(:recycle, send_meeting_cancellations: "SendOnlyToAll") #one of 'SendToNone' (default), 'SendOnlyToAll', 'SendOnlyToChanged', 'SendToAllAndSaveCopy' or 'SendToChangedAndSaveCopy'
+```
+
+
 # Viewpoint for Exchange Web Services
 [![Build Status](https://img.shields.io/travis/WinRb/Viewpoint.svg?branch=master)](https://travis-ci.org/WinRb/Viewpoint)
 [![Gem Version](https://img.shields.io/gem/v/viewpoint.svg)](https://rubygems.org/gems/viewpoint)

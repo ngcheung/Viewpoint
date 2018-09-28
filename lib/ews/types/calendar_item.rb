@@ -72,10 +72,7 @@ module Viewpoint::EWS::Types
             if value.is_a? String
               {name => {text: value}}
             elsif value.is_a? Hash
-              node = {name => {}}
-              value.each do |attrib_key, attrib_value|
-                attrib_key = camel_case(attrib_key) unless attrib_key == :text
-                node[name][attrib_key] = attrib_value
+              {name => Viewpoint::EWS::SOAP::EwsBuilder.camel_case_attributes(value)}
               end
               node
             else
@@ -99,7 +96,7 @@ module Viewpoint::EWS::Types
           self.get_all_properties!
           self
         else
-          raise EwsCreateItemError, "Could not update calendar item. #{rm.code}: #{rm.message_text}" unless rm
+          raise EwsCreateItemError, "Could not update calendar item. #{rm.code}: #{rm.message_text}" if rm
         end
       end
 

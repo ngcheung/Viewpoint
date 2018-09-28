@@ -24,9 +24,29 @@ module Viewpoint::EWS::SOAP
     include Viewpoint::EWS
     include Viewpoint::StringUtils
 
+    RESERVED_ATTRIBUTE_KEYS = %w[text sub_elements xmlns_attribute].map(&:to_sym).freeze
+
     attr_reader :nbuild
     def initialize
       @nbuild = Nokogiri::XML::Builder.new
+    end
+
+    def self.camel_case_attributes(input)
+      case input
+      when Hash
+        result = {}
+        input.each do |attrib_key, attrib_value|
+          unless RESERVED_ATTRIBUTE_KEYS.include?(attrib_key)
+            attrib_key = camel_case(attrib_key)
+          end
+            result[attrib_key] = camel_case_attributes(attrib_value)
+        end
+        result
+      when Array
+        result = input.map { |value| camel_case_attributes(value) }
+      else
+        input
+      end
     end
 
     # Build the SOAP envelope and yield this object so subelements can be built. Once
@@ -862,6 +882,22 @@ module Viewpoint::EWS::SOAP
       }
     end
 
+    def monthly_recurrence!(item)
+      nbuild[NS_EWS_TYPES].MonthlyRecurrence {
+        item.each_pair { |k, v|
+          self.send("#{k}!", v)
+        }
+      }
+    end
+
+    def yearly_recurrence!(item)
+      nbuild[NS_EWS_TYPES].YearlyRecurrence {
+        item.each_pair { |k, v|
+          self.send("#{k}!", v)
+        }
+      }
+    end
+
     def interval!(num)
       nbuild[NS_EWS_TYPES].Interval(num)
     end
@@ -872,6 +908,22 @@ module Viewpoint::EWS::SOAP
           self.send("#{k}!", v)
         }
       }
+    end
+
+    def end_date_recurrence!(item)
+      nbuild[NS_EWS_TYPES].EndDateRecurrence {
+        item.each_pair { |k, v|
+          self.send("#{k}!", v)
+        }
+      }
+    end
+
+    def never_ends!
+      nbuild[NS_EWS_TYPES].NeverEnds
+    end
+
+    def has_end!(bool)
+      nbuild[NS_EWS_TYPES].HasEnd
     end
 
     def numbered_recurrence!(item)
@@ -1007,6 +1059,10 @@ module Viewpoint::EWS::SOAP
 
     def start_date!(sd)
       nbuild[NS_EWS_TYPES].StartDate sd[:text]
+    end
+
+    def end_date!(ed)
+      nbuild[NS_EWS_TYPES].EndDate format_time(ed[:text])
     end
 
     def due_date!(dd)
