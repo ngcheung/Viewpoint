@@ -73,8 +73,6 @@ module Viewpoint::EWS::Types
               {name => {text: value}}
             elsif value.is_a? Hash
               {name => Viewpoint::EWS::SOAP::EwsBuilder.camel_case_attributes(value)}
-              end
-              node
             else
               {name => value}
             end

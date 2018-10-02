@@ -48,7 +48,12 @@ calendar.items.first.update_item!(recurrence: rec)
 
 ### Delete
 ```
-.delete!(:recycle, send_meeting_cancellations: "SendOnlyToAll") #one of 'SendToNone' (default), 'SendOnlyToAll', 'SendOnlyToChanged', 'SendToAllAndSaveCopy' or 'SendToChangedAndSaveCopy'
+send_meeting_cancellations MUST be one of 'SendToNone' (default), 'SendOnlyToAll', 'SendOnlyToChanged', 'SendToAllAndSaveCopy' or 'SendToChangedAndSaveCopy'
+
+deltype can be :recycle, defaults to :hard
+
+calendar.items[3].delete!(deltype: :recycle, send_meeting_cancellations: "SendOnlyToAll")
+calendar.items.first.delete!(instance_index: 3, opts: {send_meeting_cancellations: "SendOnlyToAll"})
 ```
 
 
