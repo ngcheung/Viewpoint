@@ -135,6 +135,30 @@ module Viewpoint::EWS::Types
       }
     end
 
+    #not sure if it's possible to search by all day status or recurrence
+    def search_for_event(subject, start_date, end_date, location)
+      items do |query|
+        query.restriction =
+          { and: [
+            comparison_clause('is_equal_to', 'item:Subject', subject),
+            comparison_clause('is_greater_than_or_equal_to', 'calendar:Start', start_date - 1.minute),
+            comparison_clause('is_less_than_or_equal_to', 'calendar:Start', end_date + 1.minute),
+            comparison_clause('is_equal_to', 'calendar:Location', location)
+          ].compact }
+      end
+    end
+
+    def comparison_clause(operator, field, value)
+      return unless value.present?
+
+      {
+        "#{operator}": [
+          { field_uRI: { field_uRI: field } },
+          { field_uRI_or_constant: { constant: { value: value } } }
+        ]
+      }
+    end
+
     # Search on the item subject
     # @param [String] match_str A simple string paramater to match against the
     #   subject.  The search ignores case and does not accept regexes... only strings.

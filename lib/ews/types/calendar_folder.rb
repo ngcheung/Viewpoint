@@ -16,28 +16,6 @@ module Viewpoint::EWS::Types
       end
     end
 
-    #not sure if it's possible to search by location or recurrence
-    def search_for_event(subject, start_date, end_date, location)
-      items do |query|
-        query.restriction =
-          { and: [
-            comparison_clause('is_equal_to', 'item:Subject', subject),
-            comparison_clause('is_greater_than_or_equal_to', 'calendar:Start', start_date - 1.minute),
-            comparison_clause('is_less_than_or_equal_to', 'calendar:Start', end_date + 1.minute),
-            comparison_clause('is_equal_to', 'calendar:Location', location)
-          ] }
-      end
-    end
-
-    def comparison_clause(operator, field, value)
-      {
-        "#{operator}": [
-          { field_uRI: { field_uRI: field } },
-          { field_uRI_or_constant: { constant: { value: value } } }
-        ]
-      }
-    end
-
     # Creates a new appointment
     # @param attributes [Hash] Parameters of the calendar item. Some example attributes are listed below.
     # @option attributes :subject [String]
